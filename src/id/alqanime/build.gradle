@@ -7,7 +7,6 @@ ext {
     extName = 'Alqanime'
     extClass = '.Alqanime'
     extVersionCode = 1
-    libVersion = '14'
 }
 
 apply from: "$rootDir/common.gradle"
