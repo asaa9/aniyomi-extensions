@@ -23,6 +23,9 @@ jobs:
       - name: Grant Execute Permission for Gradlew
         run: chmod +x gradlew
 
+      - name: Create Build Directory
+        run: mkdir -p src/id/alqanime/build
+
       - name: Build Alqanime Debug APK
         run: ./gradlew :src:id:alqanime:assembleDebug --stacktrace
 
