@@ -5,7 +5,6 @@ plugins {
 
 ext {
     extName = 'Alqanime'
-    pkgNameSuffix = 'alqanime'
     extClass = '.Alqanime'
     extVersionCode = 1
     libVersion = '14'
