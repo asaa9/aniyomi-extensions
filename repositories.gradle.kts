@@ -9,6 +9,7 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
+        gradlePluginPortal()
         google()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
