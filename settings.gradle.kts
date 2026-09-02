@@ -59,5 +59,5 @@ fun File.eachDir(block: (File) -> Unit) {
         }
     }
 }
-include(":src:id:alqanime")
- 
+include("src:id:alqanime")
+
