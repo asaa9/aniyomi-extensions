@@ -1,0 +1,14 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
+
+ext {
+    extName = 'Alqanime'
+    pkgNameSuffix = 'id.alqanime'
+    extClass = '.Alqanime'
+    extVersionCode = 1
+    libVersion = '14'
+}
+
+apply from: "$rootDir/common.gradle"
