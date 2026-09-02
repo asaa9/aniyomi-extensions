@@ -1,18 +1,18 @@
-dependencyResolutionManagement {
+pluginManagement {
     repositories {
         gradlePluginPortal()
-        mavenCentral()
         google()
-        maven(url = "https://jitpack.io")
+        mavenCentral()
     }
 }
 
-pluginManagement {
-    repositories {maven { url = uri("https://raw.githubusercontent.com/tachiyomiorg/tachiyomi/master/repository") }
-maven { url = uri("https://raw.githubusercontent.com/inorichi/injekt/master") }
-
-        gradlePluginPortal()
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+        maven { url = uri("https://raw.githubusercontent.com/tachiyomiorg/tachiyomi/master/repository") }
+        maven { url = uri("https://raw.githubusercontent.com/inorichi/injekt/master") }
     }
 }
