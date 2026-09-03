@@ -23,15 +23,13 @@ class Alqanime : ParsedAnimeHttpSource() {
     override fun popularAnimeRequest(page: Int): Request =
         GET("$baseUrl/page/$page/", headers)
 
-    override fun popularAnimeSelector(): String = "article.post-item, div.animepost"
+    override fun popularAnimeSelector(): String = "article.bs"
 
     override fun popularAnimeFromElement(element: Element): SAnime = SAnime.create().apply {
         val link = element.selectFirst("a")
         setUrlWithoutDomain(link?.attr("href") ?: "")
-        title = element.selectFirst(".title, h2, h3")?.text().orEmpty()
-        thumbnail_url = element.selectFirst("img")?.let {
-            it.attr("data-src").ifEmpty { it.attr("src") }
-        }
+        title = link?.attr("title") ?: element.selectFirst(".title, h2, h3, .tt")?.text().orEmpty()
+        thumbnail_url = element.selectFirst("img")?.attr("src")
     }
 
     override fun popularAnimeNextPageSelector(): String = "a.next, div.pagination a.next"
@@ -50,9 +48,7 @@ class Alqanime : ParsedAnimeHttpSource() {
 
     override fun animeDetailsParse(document: Document): SAnime = SAnime.create().apply {
         title = document.selectFirst("h1.entry-title, .entry-header h1")?.text().orEmpty()
-        thumbnail_url = document.selectFirst(".thumb img, .entry-content img")?.let {
-            it.attr("data-src").ifEmpty { it.attr("src") }
-        }
+        thumbnail_url = document.selectFirst(".thumb img, .entry-content img")?.attr("src")
         description = document.select(".entry-content p, .synopsis").text()
         genre = document.select(".genre-info a, a[rel=tag]").joinToString(", ") { it.text() }
         status = when {
