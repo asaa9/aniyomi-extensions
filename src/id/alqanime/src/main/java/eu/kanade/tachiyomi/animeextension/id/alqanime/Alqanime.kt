@@ -20,20 +20,16 @@ class Alqanime : ParsedAnimeHttpSource() {
     override val lang = "id"
     override val supportsLatest = true
 
-    // Mengambil dari list series utama, bukan sekadar popular
     override fun popularAnimeRequest(page: Int): Request =
         GET("$baseUrl/anime/page/$page/", headers)
 
-    // Memperluas pencarian elemen agar list lebih banyak
     override fun popularAnimeSelector(): String = "article.bs, div.animepost, div.listupd article"
 
     override fun popularAnimeFromElement(element: Element): SAnime = SAnime.create().apply {
         val link = element.selectFirst("a")
         setUrlWithoutDomain(link?.attr("href") ?: "")
-        
         val rawTitle = element.selectFirst(".tt, .title, h2, h3")?.text() ?: link?.attr("title") ?: ""
         title = rawTitle.replace(Regex("""(?i)\s*episode.*"""), "").trim()
-        
         thumbnail_url = element.selectFirst("img")?.attr("src")
     }
 
@@ -65,7 +61,6 @@ class Alqanime : ParsedAnimeHttpSource() {
         }
     }
 
-    // Memperluas selector untuk mencari episode di berbagai tipe template web
     override fun episodeListSelector(): String = "div.eplister li, div.episodelist li, ul.lstepsiode li, div.bxcl li"
 
     override fun episodeFromElement(element: Element): SEpisode = SEpisode.create().apply {
