@@ -19,7 +19,7 @@ class Alqanime : ParsedAnimeHttpSource() {
     override val lang = "id"
     override val supportsLatest = true
 
-    override fun popularAnimeRequest(page: Int): Request = 
+    override fun popularAnimeRequest(page: Int): Request =
         GET("$baseUrl/page/$page/", headers)
 
     override fun popularAnimeSelector(): String = "article.post-item, div.animepost"
@@ -28,8 +28,8 @@ class Alqanime : ParsedAnimeHttpSource() {
         val link = element.selectFirst("a")
         setUrlWithoutDomain(link?.attr("href") ?: "")
         title = element.selectFirst(".title, h2, h3")?.text().orEmpty()
-        thumbnail_url = element.selectFirst("img")?.let { 
-            it.attr("data-src").ifEmpty { it.attr("src") } 
+        thumbnail_url = element.selectFirst("img")?.let {
+            it.attr("data-src").ifEmpty { it.attr("src") }
         }
     }
 
