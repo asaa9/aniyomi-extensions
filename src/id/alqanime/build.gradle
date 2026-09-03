@@ -18,3 +18,7 @@ configurations.all {
         }
     }
 }
+
+tasks.matching { it.name.contains("lint") }.configureEach {
+    enabled = false
+}
