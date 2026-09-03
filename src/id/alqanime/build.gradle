@@ -10,3 +10,11 @@ ext {
 }
 
 apply from: "$rootDir/common.gradle"
+
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.name == 'injekt-core') {
+            details.useTarget("uy.kohesive.injekt:injekt-core:1.16.1")
+        }
+    }
+}
