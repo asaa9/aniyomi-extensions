@@ -20,15 +20,20 @@ class Alqanime : ParsedAnimeHttpSource() {
     override val lang = "id"
     override val supportsLatest = true
 
+    // Mengambil dari list series utama, bukan sekadar popular
     override fun popularAnimeRequest(page: Int): Request =
-        GET("$baseUrl/anime/page/$page/?order=popular", headers)
+        GET("$baseUrl/anime/page/$page/", headers)
 
-    override fun popularAnimeSelector(): String = "article.bs"
+    // Memperluas pencarian elemen agar list lebih banyak
+    override fun popularAnimeSelector(): String = "article.bs, div.animepost, div.listupd article"
 
     override fun popularAnimeFromElement(element: Element): SAnime = SAnime.create().apply {
         val link = element.selectFirst("a")
         setUrlWithoutDomain(link?.attr("href") ?: "")
-        title = element.selectFirst(".tt, .title, h2, h3")?.text() ?: link?.attr("title") ?: ""
+        
+        val rawTitle = element.selectFirst(".tt, .title, h2, h3")?.text() ?: link?.attr("title") ?: ""
+        title = rawTitle.replace(Regex("""(?i)\s*episode.*"""), "").trim()
+        
         thumbnail_url = element.selectFirst("img")?.attr("src")
     }
 
@@ -42,7 +47,7 @@ class Alqanime : ParsedAnimeHttpSource() {
     override fun latestUpdatesNextPageSelector(): String = popularAnimeNextPageSelector()
 
     override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request =
-        GET("$baseUrl/page/$page/?s=$query&post_type=anime", headers)
+        GET("$baseUrl/page/$page/?s=$query", headers)
 
     override fun searchAnimeSelector(): String = popularAnimeSelector()
     override fun searchAnimeFromElement(element: Element): SAnime = popularAnimeFromElement(element)
@@ -60,12 +65,13 @@ class Alqanime : ParsedAnimeHttpSource() {
         }
     }
 
-    override fun episodeListSelector(): String = "div.eplister ul li, div.episodelist ul li, ul.lstepsiode li"
+    // Memperluas selector untuk mencari episode di berbagai tipe template web
+    override fun episodeListSelector(): String = "div.eplister li, div.episodelist li, ul.lstepsiode li, div.bxcl li"
 
     override fun episodeFromElement(element: Element): SEpisode = SEpisode.create().apply {
         val link = element.selectFirst("a")
         setUrlWithoutDomain(link?.attr("href") ?: "")
-        name = element.selectFirst(".epl-title, .epl-num")?.text() ?: link?.text() ?: "Episode"
+        name = element.selectFirst(".epl-title, .epl-num, .epdl")?.text() ?: link?.text() ?: "Episode"
         val epMatch = Regex("""(?:Episode|\bEp\.?)\s*(\d+)""", RegexOption.IGNORE_CASE).find(name)
         episode_number = epMatch?.groupValues?.get(1)?.toFloatOrNull() ?: 0F
     }
