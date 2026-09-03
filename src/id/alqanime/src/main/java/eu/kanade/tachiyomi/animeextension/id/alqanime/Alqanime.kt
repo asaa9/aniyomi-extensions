@@ -21,9 +21,9 @@ class Alqanime : ParsedAnimeHttpSource() {
     override val supportsLatest = true
 
     override fun popularAnimeRequest(page: Int): Request =
-        GET("$baseUrl/anime/page/$page/", headers)
+        GET("$baseUrl/page/$page/", headers)
 
-    override fun popularAnimeSelector(): String = "article.bs, div.animepost, div.listupd article"
+    override fun popularAnimeSelector(): String = "article.bs, div.animepost"
 
     override fun popularAnimeFromElement(element: Element): SAnime = SAnime.create().apply {
         val link = element.selectFirst("a")
@@ -35,9 +35,7 @@ class Alqanime : ParsedAnimeHttpSource() {
 
     override fun popularAnimeNextPageSelector(): String = "a.next, div.pagination a.next"
 
-    override fun latestUpdatesRequest(page: Int): Request =
-        GET("$baseUrl/anime/page/$page/?order=update", headers)
-
+    override fun latestUpdatesRequest(page: Int): Request = popularAnimeRequest(page)
     override fun latestUpdatesSelector(): String = popularAnimeSelector()
     override fun latestUpdatesFromElement(element: Element): SAnime = popularAnimeFromElement(element)
     override fun latestUpdatesNextPageSelector(): String = popularAnimeNextPageSelector()
@@ -50,9 +48,9 @@ class Alqanime : ParsedAnimeHttpSource() {
     override fun searchAnimeNextPageSelector(): String = popularAnimeNextPageSelector()
 
     override fun animeDetailsParse(document: Document): SAnime = SAnime.create().apply {
-        title = document.selectFirst("h1.entry-title, .entry-header h1")?.text().orEmpty()
-        thumbnail_url = document.selectFirst(".thumb img, .entry-content img")?.attr("src")
-        description = document.select(".entry-content p, .synopsis").text()
+        title = document.selectFirst("h1.entry-title, .entry-header h1")?.text()?.replace(Regex("""(?i)\s*episode.*"""), "")?.trim().orEmpty()
+        thumbnail_url = document.selectFirst(".thumb img, .entry-content img, .bigcover img")?.attr("src")
+        description = document.select(".entry-content p, .synopsis, .mindes").text()
         genre = document.select(".genre-info a, a[rel=tag]").joinToString(", ") { it.text() }
         status = when {
             document.text().contains("Completed", ignoreCase = true) -> SAnime.COMPLETED
@@ -69,6 +67,22 @@ class Alqanime : ParsedAnimeHttpSource() {
         name = element.selectFirst(".epl-title, .epl-num, .epdl")?.text() ?: link?.text() ?: "Episode"
         val epMatch = Regex("""(?:Episode|\bEp\.?)\s*(\d+)""", RegexOption.IGNORE_CASE).find(name)
         episode_number = epMatch?.groupValues?.get(1)?.toFloatOrNull() ?: 0F
+    }
+
+    override fun episodeListParse(response: Response): List<SEpisode> {
+        val document = response.asJsoup()
+        val episodes = document.select(episodeListSelector()).map { episodeFromElement(it) }
+        
+        return if (episodes.isNotEmpty()) {
+            episodes
+        } else {
+            val ep = SEpisode.create()
+            ep.setUrlWithoutDomain(response.request.url.toString())
+            ep.name = document.selectFirst("h1.entry-title, .entry-header h1")?.text() ?: "Episode"
+            val epMatch = Regex("""(?:Episode|\bEp\.?)\s*(\d+)""", RegexOption.IGNORE_CASE).find(ep.name)
+            ep.episode_number = epMatch?.groupValues?.get(1)?.toFloatOrNull() ?: 1F
+            listOf(ep)
+        }
     }
 
     override fun videoListParse(response: Response): List<Video> {
