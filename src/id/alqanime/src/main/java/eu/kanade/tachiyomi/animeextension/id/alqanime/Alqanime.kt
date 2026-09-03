@@ -16,7 +16,7 @@ import java.lang.Exception
 class Alqanime : ParsedAnimeHttpSource() {
 
     override val name = "Alqanime"
-    override val baseUrl = "https://alqanime.com"
+    override val baseUrl = "https://alqanime.net"
     override val lang = "id"
     override val supportsLatest = true
 
