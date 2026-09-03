@@ -6,6 +6,7 @@ import eu.kanade.tachiyomi.animesource.model.SEpisode
 import eu.kanade.tachiyomi.animesource.model.Video
 import eu.kanade.tachiyomi.animesource.online.ParsedAnimeHttpSource
 import eu.kanade.tachiyomi.network.GET
+import eu.kanade.tachiyomi.util.asJsoup
 import okhttp3.Request
 import okhttp3.Response
 import org.jsoup.nodes.Document
@@ -75,7 +76,7 @@ class Alqanime : ParsedAnimeHttpSource() {
         val document = response.asJsoup()
         val videoList = mutableListOf<Video>()
 
-        document.select("video source").forEach { source ->
+        for (source in document.select("video source")) {
             val videoUrl = source.attr("src")
             val quality = source.attr("label").ifEmpty { "Default" }
             if (videoUrl.isNotEmpty()) {
