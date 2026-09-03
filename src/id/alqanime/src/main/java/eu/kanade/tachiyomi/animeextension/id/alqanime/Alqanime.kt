@@ -20,7 +20,6 @@ class Alqanime : ParsedAnimeHttpSource() {
     override val lang = "id"
     override val supportsLatest = true
 
-    // Targetkan langsung ke daftar anime, bukan beranda episode
     override fun popularAnimeRequest(page: Int): Request =
         GET("$baseUrl/anime/page/$page/?order=popular", headers)
 
@@ -35,14 +34,13 @@ class Alqanime : ParsedAnimeHttpSource() {
 
     override fun popularAnimeNextPageSelector(): String = "a.next, div.pagination a.next"
 
-    override fun latestUpdatesRequest(page: Int): Request = 
+    override fun latestUpdatesRequest(page: Int): Request =
         GET("$baseUrl/anime/page/$page/?order=update", headers)
-        
+
     override fun latestUpdatesSelector(): String = popularAnimeSelector()
     override fun latestUpdatesFromElement(element: Element): SAnime = popularAnimeFromElement(element)
     override fun latestUpdatesNextPageSelector(): String = popularAnimeNextPageSelector()
 
-    // Filter pencarian khusus untuk tipe konten anime
     override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request =
         GET("$baseUrl/page/$page/?s=$query&post_type=anime", headers)
 
