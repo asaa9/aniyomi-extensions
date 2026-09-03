@@ -14,17 +14,13 @@ import org.jsoup.nodes.Element
 import java.lang.Exception
 
 class Alqanime : ParsedAnimeHttpSource() {
-
     override val name = "Alqanime"
     override val baseUrl = "https://alqanime.net"
     override val lang = "id"
     override val supportsLatest = true
 
-    override fun popularAnimeRequest(page: Int): Request =
-        GET("$baseUrl/page/$page/", headers)
-
+    override fun popularAnimeRequest(page: Int): Request = GET("$baseUrl/page/$page/", headers)
     override fun popularAnimeSelector(): String = "article.bs, div.animepost"
-
     override fun popularAnimeFromElement(element: Element): SAnime = SAnime.create().apply {
         val link = element.selectFirst("a")
         setUrlWithoutDomain(link?.attr("href") ?: "")
@@ -32,7 +28,6 @@ class Alqanime : ParsedAnimeHttpSource() {
         title = rawTitle.replace(Regex("""(?i)\s*episode.*"""), "").trim()
         thumbnail_url = element.selectFirst("img")?.attr("src")
     }
-
     override fun popularAnimeNextPageSelector(): String = "a.next, div.pagination a.next"
 
     override fun latestUpdatesRequest(page: Int): Request = popularAnimeRequest(page)
@@ -40,9 +35,7 @@ class Alqanime : ParsedAnimeHttpSource() {
     override fun latestUpdatesFromElement(element: Element): SAnime = popularAnimeFromElement(element)
     override fun latestUpdatesNextPageSelector(): String = popularAnimeNextPageSelector()
 
-    override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request =
-        GET("$baseUrl/page/$page/?s=$query", headers)
-
+    override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request = GET("$baseUrl/page/$page/?s=$query", headers)
     override fun searchAnimeSelector(): String = popularAnimeSelector()
     override fun searchAnimeFromElement(element: Element): SAnime = popularAnimeFromElement(element)
     override fun searchAnimeNextPageSelector(): String = popularAnimeNextPageSelector()
@@ -60,7 +53,6 @@ class Alqanime : ParsedAnimeHttpSource() {
     }
 
     override fun episodeListSelector(): String = "div.eplister li, div.episodelist li, ul.lstepsiode li, div.bxcl li"
-
     override fun episodeFromElement(element: Element): SEpisode = SEpisode.create().apply {
         val link = element.selectFirst("a")
         setUrlWithoutDomain(link?.attr("href") ?: "")
@@ -72,7 +64,6 @@ class Alqanime : ParsedAnimeHttpSource() {
     override fun episodeListParse(response: Response): List<SEpisode> {
         val document = response.asJsoup()
         val episodes = document.select(episodeListSelector()).map { episodeFromElement(it) }
-        
         return if (episodes.isNotEmpty()) {
             episodes
         } else {
@@ -88,7 +79,6 @@ class Alqanime : ParsedAnimeHttpSource() {
     override fun videoListParse(response: Response): List<Video> {
         val document = response.asJsoup()
         val videoList = mutableListOf<Video>()
-
         for (source in document.select("video source")) {
             val videoUrl = source.attr("src")
             val quality = source.attr("label").ifEmpty { "Default" }
@@ -96,14 +86,12 @@ class Alqanime : ParsedAnimeHttpSource() {
                 videoList.add(Video(videoUrl, quality, videoUrl))
             }
         }
-
         val iframeUrl = document.selectFirst("iframe[src]")?.attr("abs:src")
         if (!iframeUrl.isNullOrEmpty()) {
             try {
                 videoList.add(Video(iframeUrl, "Web Player", iframeUrl))
             } catch (_: Exception) {}
         }
-
         return videoList
     }
 
