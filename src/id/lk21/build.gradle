@@ -1,0 +1,12 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+ext {
+    extName = 'LK21'
+    pkgNameSuffix = 'id.lk21'
+    extClass = '.LK21'
+    extVersionCode = 1
+    libVersion = '14'
+}
+
+apply from: "$rootDir/common.gradle"
