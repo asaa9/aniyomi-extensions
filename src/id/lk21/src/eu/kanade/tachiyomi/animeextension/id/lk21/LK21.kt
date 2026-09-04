@@ -62,3 +62,4 @@ class LK21 : ParsedAnimeHttpSource() {
         return listOf(Video(iframeUrl, "Streaming Link (External)", iframeUrl))
     }
 }
+
